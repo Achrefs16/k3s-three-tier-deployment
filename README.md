@@ -8,37 +8,8 @@ All steps, commands, and screenshots are documented for clarity.
 
 ## 📁 Folder Structure
 
-k8s-app/
-├─ app/
-│ ├─ frontend/
-│ └─ backend/
-├─ k8s/
-│ ├─ namespace.yaml
-│ ├─ frontend-deployment.yaml
-│ ├─ frontend-service.yaml
-│ ├─ backend-deployment.yaml
-│ ├─ backend-service.yaml
-│ ├─ backend-configmap.yaml
-│ ├─ postgres-statefulset.yaml
-│ ├─ postgres-service.yaml
-│ ├─ postgres-headless-service.yaml
-│ └─ db-secret.yaml
-├─ docs/
-│ └─ screenshots/
-├─ scripts/
-│ ├─ build_push.sh
-│ └─ deploy.sh
-└─ README.md
-
-
+![Structure](docs/screenshots/str.png)
 ## 1️⃣ Build & Push Docker Images
-
-Make sure you are in the `scripts/` directory.
-
-```bash
-cd ~/k8s-app/scripts
-
-build_push.sh 
 
 Create Kubernetes Namespace
 
