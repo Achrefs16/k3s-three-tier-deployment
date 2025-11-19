@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #555; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+        .btn-add { background: #10b981; color: white; }
+        .btn-edit { background: #3b82f6; color: white; }
+        .btn-delete { background: #ef4444; color: white; }
+        .btn-cancel { background: #6b7280; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f3f4f6; color: #333; }
+        .actions button { margin: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Student Management</h1>
+        
+        <form id="studentForm">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="age" required>
+            </div>
+            <div class="form-group">
+                <label>Grade</label>
+                <input type="text" id="grade" required>
+            </div>
+            <button type="submit" class="btn-add" id="submitBtn">Add Student</button>
+            <button type="button" class="btn-cancel" id="cancelBtn" style="display:none;">Cancel</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Grade</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentsList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL ="http://192.168.50.30:30001";
+        let editingId = null;
+
+        async function loadStudents() {
+            const res = await fetch(`${API_URL}/api/students`);
+            const students = await res.json();
+            const tbody = document.getElementById('studentsList');
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.age}</td>
+                    <td>${s.grade}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="editStudent(${s.id})">Edit</button>
+                        <button class="btn-delete" onclick="deleteStudent(${s.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                age: parseInt(document.getElementById('age').value),
+                grade: document.getElementById('grade').value
+            };
+
+            const url = editingId ? `${API_URL}/api/students/${editingId}` : `${API_URL}/api/students`;
+            const method = editingId ? 'PUT' : 'POST';
+
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            document.getElementById('studentForm').reset();
+            editingId = null;
+            document.getElementById('submitBtn').textContent = 'Add Student';
+            document.getElementById('cancelBtn').style.display = 'none';
+            loadStudents();
+        });
+
+        async function editStudent(id) {
+            const res = await fetch(`${API_URL}/api/students/${id}`);
+            const student = await res.json();
+            
+            document.getElementById('name').value = student.name;
+            document.getElementById('email').value = student.email;
+            document.getElementById('age').value = student.age;
+            document.getElementById('grade').value = student.grade;
+            
+            editingId = id;
+            document.getElementById('submitBtn').textContent = 'Update Student';
+            document.getElementById('cancelBtn').style.display = 'inline';
+        }
+
+        async function deleteStudent(id) {
+            if (confirm('Delete this student?')) {
+                await fetch(`${API_URL}/api/students/${id}`, { method: 'DELETE' });
+                loadStudents();
+            }
+        }
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('studentForm').reset();
+            editingId = null;
+            document.getElementById('submitBtn').textContent = 'Add Student';
+            document.getElementById('cancelBtn').style.display = 'none';
+        });
+
+        loadStudents();
+    </script>
+</body>
+</html>
