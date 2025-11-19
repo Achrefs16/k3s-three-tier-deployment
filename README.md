@@ -13,25 +13,31 @@ All steps, commands, and screenshots are documented for clarity.
 
 Create Kubernetes Namespace
 
-Deploy Backend
+#Deploy Backend
+
 kubectl apply -f k8s/backend-deployment.yaml
+
 kubectl apply -f k8s/backend-service.yaml
+
 kubectl apply -f k8s/backend-configmap.yaml
 
 
-kubectl get pods -n student-app
-
  
-Deploy frontend:
+#Deploy frontend:
 
 kubectl apply -f k8s/frontend-deployment.yaml
+
 kubectl apply -f k8s/frontend-service.yaml
 
 
-Deploy PostgreSQL StatefulSet with PVC
+#Deploy PostgreSQL StatefulSet with PVC
+
 kubectl apply -f k8s/db-secret.yaml
+
 kubectl apply -f k8s/postgres-statefulset.yaml
+
 kubectl apply -f k8s/postgres-service.yaml
+
 kubectl apply -f k8s/postgres-headless-service.yaml
 
 
@@ -72,4 +78,5 @@ Rebuild and push Docker images:
 Delete existing deployments:
 
 kubectl delete deployment frontend -n student-app
+
 kubectl delete deployment backend -n student-app
